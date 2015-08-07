@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipException;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -40,34 +41,42 @@ public class Read2ExtractUserInfo {
         PrintStream ps = new PrintStream(outputf);
         int count = 0;
         for (File fileEntry : directory.listFiles()) {
-            br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fileEntry))));
-            while (br.ready()) {
-                jsonStr = br.readLine();
-                tweet = TwitterObjectFactory.createStatus(jsonStr);
-                User user = tweet.getUser();
-                if (user != null) {
-                    count++;
-                    printuserinfo(ps, user);
-                    if (count % 10000 == 0) {
-                        logger.info("read in tweets: " + count);
+            try {
+                br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fileEntry))));
+                while (br.ready()) {
+                    jsonStr = br.readLine();
+                    tweet = TwitterObjectFactory.createStatus(jsonStr);
+                    if (!tweet.getLang().equals("en")){
+                        continue;
+                    }
+                    User user = tweet.getUser();
+                    if (user != null) {
+                        count++;
+                        printuserinfo(ps, user);
+                        if (count % 10000 == 0) {
+                            logger.info("read in tweets: " + count);
+                        }
                     }
                 }
+                br.close();
+
+            } catch (ZipException ex) {
+                logger.error("", ex);
             }
-            br.close();
         }
         ps.close();
     }
 
     private void printuserinfo(PrintStream ps, User user) {
         long userid = user.getId();
-        String username = user.getName();
+        //String username = user.getName();
         int num_followers = user.getFollowersCount();
         int num_tweets = user.getStatusesCount();
         if (num_followers > 500 && num_tweets > 3500) {
             if (!userIds.contains(userid)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(userid).append("\t");
-                sb.append(username).append("\t");
+                //sb.append(username).append("\t");
                 sb.append(num_followers).append("\t");
                 sb.append(num_tweets);
                 ps.println(sb.toString());

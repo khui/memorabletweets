@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="maven-antrun-" default="main"  >
 <target name="main">
-  <scp trust="true" file="/home/khui/workspace/javaworkspace/NetBeansProjects/memorabletweets/target/memorabletweets.jar" todir="khui@contact.mpi-inf.mpg.de:/home/khui/workspace/javaworkspace" keyfile="/home/khui/.ssh/id_rsa"/>
+  <scp trust="true" file="/local/home/khui/workspace/javaworkspace/NetBeansProjects/memorabletweets/target/memorabletweets.jar" todir="khui@contact.mpi-inf.mpg.de:/home/khui/workspace/javaworkspace" keyfile="/home/khui/.ssh/id_rsa"/>
 </target>
 </project>
