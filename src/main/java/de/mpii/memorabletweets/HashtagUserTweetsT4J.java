@@ -3,9 +3,11 @@ package de.mpii.memorabletweets;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -17,15 +19,16 @@ import java.util.*;
 /**
  * Created by khui on 09/03/16.
  */
-public class HashtagUserTweets {
+public class HashtagUserTweetsT4J {
 
-    static Logger logger = Logger.getLogger(HashtagUserTweets.class);
+    static Logger logger = Logger.getLogger(HashtagUserTweetsT4J.class);
 
 
-    private Twitter twitter;
+    public final Twitter twitter;
 
-    public HashtagUserTweets(String consumerKey, String consumerSecret, String token, String secret){
+    public HashtagUserTweetsT4J(String consumerKey, String consumerSecret, String token, String secret){
         Configuration conf = configAccount(consumerKey, consumerSecret, token, secret);
+        System.out.println(conf.isIncludeEntitiesEnabled());
         twitter = new TwitterFactory(conf).getInstance();
 
     }
@@ -49,7 +52,6 @@ public class HashtagUserTweets {
         Map<Long, String> tweetidRawJson = new HashMap<>();
         for(String query : queries) {
             List<Status> tweets = searchTweets(query, numoftoptweet);
-            logger.info("Retrieved " + tweets.size() + " tweets for " + query);
             List<User> users = tweets2Users(tweets);
             for (User user : users) {
                 String userfilename = String.valueOf(user.getId());
@@ -115,7 +117,7 @@ public class HashtagUserTweets {
                 logger.error("userTimeline TwitterException: " + te);
             }
         }
-        logger.info("Fetched " + alltweets.size() + " tweets in total for " + userid);
+        logger.info("Retrieved " + alltweets.size() + " tweets in total for " + userid);
         return alltweets;
     }
 
@@ -135,7 +137,12 @@ public class HashtagUserTweets {
                 try {
                     System.out.println(query.toString());
                     QueryResult result = twitter.search(query);
-                    logger.info(result.toString());
+                    List<Status> resTweets = result.getTweets();
+                    int resultcount = resTweets.size();
+                    logger.info(result.toString() + "\t" + resultcount);
+                    if (resultcount == 0){
+                        break;
+                    }
                     Thread.sleep(10000);
 
                     requestcount++;
@@ -144,7 +151,7 @@ public class HashtagUserTweets {
                         Thread.sleep(1000 * 60 * 15);
                         requestcount = 0;
                     }
-                    tweets.addAll(result.getTweets());
+                    tweets.addAll(resTweets);
                     logger.info("Fetched " + tweets.size() + " tweets");
                     for (Status t: tweets)
                         if(t.getId() < lastID) lastID = t.getId();
@@ -160,6 +167,7 @@ public class HashtagUserTweets {
             logger.error("Failed to search users: " + e.getMessage());
             System.exit(-1);
         }
+        logger.info("Get " + tweets.size() + " tweets in total for " + querystr);
         return tweets;
     }
 
@@ -184,7 +192,9 @@ public class HashtagUserTweets {
         cb.setOAuthAccessTokenSecret(secret);
         cb.setOAuthConsumerKey(consumerKey);
         cb.setOAuthConsumerSecret(consumerSecret);
-        cb.setJSONStoreEnabled(true);
+       // cb.setJSONStoreEnabled(true);
+        cb.setIncludeEntitiesEnabled(false);
+        System.out.println(cb);
         return cb.build();
     }
 
@@ -197,20 +207,13 @@ public class HashtagUserTweets {
         String token="335038158-55IbstIgPy4Igy4B5ZBWCrbISoAh5adX05hLAdeM";
         String secret="2fkymsHMOgb0nKo5Xb0e8uLQbKuK6dL6ZEoIYVv9jPFW8";
         String outdir = "/home/khui/workspace/result/memorabletweets";
-        HashtagUserTweets hut = new HashtagUserTweets(consumerKey, consumerSecret, token, secret);
-//        QueryResult results = hut.twitter.search(new Query("#CIKM"));
-//        System.out.println(results.getRateLimitStatus());
-//        System.out.println(results.toString());
-//        for(Status tweet : results.getTweets()){
-//            System.out.println(tweet.toString());
-//        }
-        //hut.printUserTweets(Collections.singletonList("#CIKM"), outdir, 100);
-        Twitter twitter = hut.twitter;
-        Query query = new Query("source:twitter4j yusukey");
-        QueryResult result = twitter.search(query);
-        System.out.println(result.toString());
-        for (Status status : result.getTweets()) {
-            System.out.println("@" + status.getUser().getScreenName() + ":" + status.getText());
+        HashtagUserTweetsT4J hut = new HashtagUserTweetsT4J(consumerKey, consumerSecret, token, secret);
+        QueryResult results = hut.twitter.search(new Query("#CIKM"));
+        System.out.println(results.getRateLimitStatus());
+        System.out.println(results.toString());
+        for(Status tweet : results.getTweets()){
+            System.out.println(tweet.toString());
         }
+        hut.printUserTweets(Collections.singletonList("#CIKM"), outdir, 100);
     }
 }
