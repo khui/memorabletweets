@@ -120,15 +120,18 @@ public class HashtagUserTweetsJH {
         options.addOption("s", "since", true, "since");
         options.addOption("u", "until", true, "until");
         options.addOption("o", "outdir", true, "output directory");
+        options.addOption("q", "queries", true, "queries delimited by commas");
         options.addOption("k", "keydir", true, "token directory for tweet dumper");
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args);
-        String outdir = "";
-        String keydir = "";
+        String outdir = "", keydir = "", querystr = "#cikm,#sigir";
         String since="2015-03-01", until="2016-03-01";
         String log4jconf = "src/main/java/log4j.xml";
         if (cmd.hasOption("o")) {
             outdir = cmd.getOptionValue("o");
+        }
+        if (cmd.hasOption("q")) {
+            querystr = cmd.getOptionValue("q");
         }
         if (cmd.hasOption("k")) {
             keydir = cmd.getOptionValue("k");
@@ -146,7 +149,8 @@ public class HashtagUserTweetsJH {
         LogManager.getRootLogger().setLevel(Level.INFO);
         LogManager.getLogger("org.apache.http").setLevel(Level.OFF);
         HashtagUserTweetsJH hutjh = new HashtagUserTweetsJH(outdir, since, until);
-        String[] queries = new String[]{"#cikm", "#sigir"};
+        String[] queries = querystr.split(",");
+        logger.info("Input queries " + queries.length + " from " + querystr);
         for (String query : queries) {
             Set<String> users = hutjh.tweets2Users(query);
             String expid = query+ "_" + since + "_" + until;
