@@ -120,8 +120,8 @@ public class HashtagUserTweetsJH {
         options.addOption("o", "outdir", true, "output directory");
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args);
-        String outdir = "/GW/D5data-2/khui/microblogtrack/memorabletweets";
-        String keydir = "/GW/D5data-2/khui/microblogtrack/apikeys/batchkeys/dumperkey";
+        String outdir = "";
+        String keydir = "";
         String since="2015-03-01", until="2016-03-01";
         String log4jconf = "src/main/java/log4j.xml";
         if (cmd.hasOption("o")) {
@@ -129,6 +129,12 @@ public class HashtagUserTweetsJH {
         }
         if (cmd.hasOption("k")) {
             keydir = cmd.getOptionValue("k");
+        }
+        if (cmd.hasOption("s")) {
+            since = cmd.getOptionValue("s");
+        }
+        if (cmd.hasOption("u")) {
+            until = cmd.getOptionValue("u");
         }
         if (cmd.hasOption("l")) {
             log4jconf = cmd.getOptionValue("l");
