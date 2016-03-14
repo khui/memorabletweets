@@ -19,5 +19,5 @@ the time range of the tweets for a given user.
 One example usage is as follows. Note that, to use the toolkit, you first need configure maven dependency management tool (https://maven.apache.org/). 
 Depending on how you want to run the program, the hadoop jar can be replaced.
 
-hadoop jar memorabletweets.jar de.mpii.memorabletweets.HashtagUserTweetsJH -o $outdir -k @keydir -s "2015-03-01" \
+hadoop jar memorabletweets.jar de.mpii.memorabletweets.HashtagUserTweetsJH -o $outdir -k @keydir -s "2015-03-01"
                 -u "2016-03-01" -l $logconffile -q "#cikm,#sigir"
