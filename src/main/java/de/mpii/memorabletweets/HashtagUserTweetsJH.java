@@ -117,7 +117,10 @@ public class HashtagUserTweetsJH {
     public static void  main(String[] args) throws Exception {
         Options options = new Options();
         options.addOption("l", "log4jxml", true, "log4jxml");
+        options.addOption("s", "since", true, "since");
+        options.addOption("u", "until", true, "until");
         options.addOption("o", "outdir", true, "output directory");
+        options.addOption("k", "keydir", true, "token directory for tweet dumper");
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args);
         String outdir = "";
