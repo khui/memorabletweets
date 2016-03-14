@@ -1,38 +1,23 @@
 package de.mpii.microblogtrack.task.archiver;
 
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.TObjectLongMap;
-import gnu.trove.map.custom_hash.TObjectLongCustomHashMap;
-
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.text.ParseException;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.compress.archivers.ArchiveException;
-
-import twitter4j.RateLimitStatus;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.TwitterObjectFactory;
+import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
+
+import java.io.*;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public final class LookupT4j {
 
@@ -52,7 +37,7 @@ public final class LookupT4j {
 
     private long totalwaittime = 0;
 
-    private final int numoffileinzip = 100000;
+    private final int numoffileinzip = 20000;
 
     public LookupT4j(String keydir){
         this.keydirectory = keydir;

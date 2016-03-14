@@ -34,6 +34,12 @@ public class HashtagUserTweetsJH {
         this.outdir = outdir;
         this.since = since;
         this.until = until;
+        if(!new File(outdir + "/tweetids").exists()){
+            new File(outdir + "/tweetids").mkdir();
+        }
+        if(!new File(outdir + "/tweetjson").exists()){
+            new File(outdir + "/tweetjson").mkdir();
+        }
     }
 
 
@@ -116,7 +122,7 @@ public class HashtagUserTweetsJH {
         CommandLine cmd = parser.parse(options, args);
         String outdir = "/GW/D5data-2/khui/microblogtrack/memorabletweets";
         String keydir = "/GW/D5data-2/khui/microblogtrack/apikeys/batchkeys/dumperkey";
-        String since="2016-02-14", until="2016-03-01";
+        String since="2015-03-01", until="2016-03-01";
         String log4jconf = "src/main/java/log4j.xml";
         if (cmd.hasOption("o")) {
             outdir = cmd.getOptionValue("o");
