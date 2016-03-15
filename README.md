@@ -1,7 +1,13 @@
-This is a toolkit to extract tweets for a group of users who are insterested in specific topic, e.g., information retrieval.
-The toolkit mines all users whose tweets contain the given a query, e.g., "#cikm". Afterward, the tweetids from the timelines for
-these users are dumped to specific directory. Finally, using the tweet api, we download and store the corresponding 
+This is a toolkit to extract tweets for a group of users who are interested in specific topic, e.g., information retrieval.
+The toolkit mines all users whose tweets contain a given query, e.g., "#cikm". Afterward, the tweetids from the timelines for
+these users are dumped to specific directory. Finally, using the tweet lookup api, we download and store the corresponding
 tweet content for tweetids in json format, which can be digested by Twitter4j directly.
+
+In favor of readability for human, the json file of tweets are stored in zip directory, which is less efficient in IO comparing
+with gzip. When the number of tweet is huge, the io function should be rewritten to use gzip and save each tweet in a newline.
+Another repository of mine, the microblogtrack, contains the method under the utility.io package. Given that sometimes the
+twitter lookup api is not stable, the resumption after broken download is also implemented. The zip file that can not be re-open
+properly will be deleted.
 
 Usage:
 de.mpii.memorabletweets.HashtagUserTweetsJH is the main entry.
