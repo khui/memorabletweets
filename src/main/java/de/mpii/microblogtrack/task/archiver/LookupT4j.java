@@ -195,7 +195,10 @@ public final class LookupT4j {
 
     public void crawltweets(String tweetidfile, String outdirectory) throws IOException, InterruptedException, ArchiveException {
         int zipcount = 1;
-        PrintStream pslog = new PrintStream(new File(outdirectory, expid + "-zipfnum.log"));
+        while(new File(outdirectory, expid + "-" + zipcount + ".zip").exists()){
+            zipcount++;
+        }
+        PrintStream pslog = new PrintStream(new FileOutputStream(new File(outdirectory, expid + "-zipfnum.log"), true));
         ZipOutputStream currentArchiveStream = new ZipOutputStream(
                 new BufferedOutputStream(new FileOutputStream(new File(
                         outdirectory, expid + "-" + (zipcount++) + ".zip"))));
@@ -203,7 +206,7 @@ public final class LookupT4j {
         TLongArrayList alltweetids = new TLongArrayList(tweetids);
         ResponseList<Status> tweetspack;
         int from = 0;
-        int to = 0;
+        int to;
         int length = 100;
         readinAPIKeys();
         updateTwitter();
@@ -223,6 +226,9 @@ public final class LookupT4j {
                     currentArchiveStream.close();
                     pslog.println(expid + "-" + (zipcount - 1) + " : " + numInCurrentArchive);
                     numInCurrentArchive = 0;
+                    while(new File(outdirectory, expid + "-" + zipcount + ".zip").exists()){
+                        zipcount++;
+                    }
                     currentArchiveStream = new ZipOutputStream(
                             new BufferedOutputStream(new FileOutputStream(
                                     new File(outdirectory, expid + "-" + (zipcount++)
@@ -257,7 +263,10 @@ public final class LookupT4j {
 
     public void crawltweets(long[] tweetids, String outdirectory) throws IOException, InterruptedException, ArchiveException {
         int zipcount = 1;
-        PrintStream pslog = new PrintStream(new File(outdirectory, expid + "-zipfnum.log"));
+        while(new File(outdirectory, expid + "-" + zipcount + ".zip").exists()){
+            zipcount++;
+        }
+        PrintStream pslog = new PrintStream(new FileOutputStream(new File(outdirectory, expid + "-zipfnum.log"), true));
         ZipOutputStream currentArchiveStream = new ZipOutputStream(
                 new BufferedOutputStream(new FileOutputStream(new File(
                         outdirectory, expid + "-" + (zipcount++) + ".zip"))));
@@ -284,6 +293,9 @@ public final class LookupT4j {
                     currentArchiveStream.close();
                     pslog.println(expid + "-" + (zipcount - 1) + " : " + numInCurrentArchive);
                     numInCurrentArchive = 0;
+                    while(new File(outdirectory, expid + "-" + zipcount + ".zip").exists()){
+                        zipcount++;
+                    }
                     currentArchiveStream = new ZipOutputStream(
                             new BufferedOutputStream(new FileOutputStream(
                                     new File(outdirectory, expid + "-" + (zipcount++)
