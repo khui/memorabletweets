@@ -37,7 +37,7 @@ public final class LookupT4j {
 
     private long totalwaittime = 0;
 
-    private final int numoffileinzip = 20000;
+    private final int numoffileinzip = 50000;
 
     public LookupT4j(String keydir){
         this.keydirectory = keydir;

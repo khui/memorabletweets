@@ -1,6 +1,8 @@
 package de.mpii.memorabletweets;
 
 import de.mpii.microblogtrack.task.archiver.LookupT4j;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import me.jhenrique.manager.TweetManager;
@@ -14,6 +16,7 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import twitter4j.TwitterException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -37,11 +40,7 @@ public class HashtagUserTweetsJH {
         if(!new File(outdir + "/tweetids").exists()){
             new File(outdir + "/tweetids").mkdir();
         }
-        if(!new File(outdir + "/tweetjson").exists()){
-            new File(outdir + "/tweetjson").mkdir();
-        }
     }
-
 
     private void write2file(String filename, List<Long> tweetids) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
@@ -67,9 +66,22 @@ public class HashtagUserTweetsJH {
         return tweetids.toArray();
     }
 
-    public void crawlTweetids(String keydir) throws IOException, InterruptedException, ArchiveException {
+    public void crawlTweetids(String keydir) throws IOException, InterruptedException, ArchiveException, TwitterException {
         long[] tweetids = readTweetids(outdir + "/tweetids");
+        if (!new File(outdir + "/tweetjson").exists()) {
+            new File(outdir + "/tweetjson").mkdir();
+        } else {
+            TLongSet tweetidExisted = Read2ExtractUserInfo.extractZip2TweetIds(outdir + "/tweetjson");
+            TLongList tweetid2download = new TLongArrayList();
+            for (long tweetid : tweetids) {
+                if (!tweetidExisted.contains(tweetid)) {
+                    tweetid2download.add(tweetid);
+                }
+            }
+            tweetids = tweetid2download.toArray();
+        }
         LookupT4j dtweet = new LookupT4j(keydir);
+        logger.info("Remaining " + tweetids.length + " tweets to download.");
         dtweet.crawltweets(tweetids, outdir + "/tweetjson");
     }
 
@@ -152,6 +164,9 @@ public class HashtagUserTweetsJH {
         String[] queries = querystr.split(",");
         logger.info("Input queries " + queries.length + " from " + querystr);
         for (String query : queries) {
+            if (query.length() < 2){
+                continue;
+            }
             Set<String> users = hutjh.tweets2Users(query);
             String expid = query+ "_" + since + "_" + until;
             hutjh.userTweetids(users, expid);

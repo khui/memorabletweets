@@ -2,19 +2,18 @@ package de.mpii.memorabletweets;
 
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipException;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Enumeration;
+import java.util.zip.*;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -66,6 +65,46 @@ public class Read2ExtractUserInfo {
         }
         ps.close();
     }
+
+    public static TLongSet extractZip2TweetIds(String zipdir) throws IOException, TwitterException, InterruptedException {
+        TLongSet tweetids = new TLongHashSet();
+        String jsonStr;
+        Status tweet;
+        StringWriter strwriter;
+        File dir = new File(zipdir);
+        try {
+            for (String f : dir.list()) {
+                String zipfilename = zipdir + "/" + f;
+                if (f.endsWith(".zip")) {
+                    try {
+                        ZipFile zipFile = new ZipFile(zipfilename);
+                        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+                        while (zipEntries.hasMoreElements()) {
+                            strwriter = new StringWriter();
+                            ZipEntry entry = zipEntries.nextElement();
+                            IOUtils.copy(zipFile.getInputStream(entry), strwriter, Charset.defaultCharset());
+                            jsonStr = strwriter.toString();
+                            tweet = TwitterObjectFactory.createStatus(jsonStr);
+                            tweetids.add(tweet.getId());
+                            strwriter.close();
+                            if (tweetids.size() % 50000 == 0) {
+                                logger.info("Read in existing tweetids: " + tweetids.size());
+                            }
+                        }
+                        zipFile.close();
+                    }catch(ZipException zex){
+                        logger.error(f + " will be deleted.", zex);
+                        boolean delete = new File(zipfilename).delete();
+                    }
+                }
+            }
+        } catch(Exception ex){
+            logger.error("", ex);
+        }
+        logger.info("In total read in existing tweetids: " + tweetids.size());
+        return tweetids;
+    }
+
 
     private void printuserinfo(PrintStream ps, User user) {
         long userid = user.getId();
