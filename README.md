@@ -7,7 +7,7 @@ In favor of readability for human, the json file of tweets are stored in zip dir
 with gzip. When the number of tweet is huge, the io function should be rewritten to use gzip and save each tweet in a newline.
 Another repository of mine, the microblogtrack, contains the method under the utility.io package. Given that sometimes the
 twitter lookup api is not stable, the resumption after broken download is also implemented. The zip file that can not be re-open
-properly will be deleted.
+properly will be deleted. To speed up the lookup procedure, download sequentially with multiple keys is supported.
 
 Usage:
 de.mpii.memorabletweets.HashtagUserTweetsJH is the main entry.
